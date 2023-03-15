@@ -20,6 +20,7 @@ def open_browser():
     browser = Browser('chrome')
     return browser
 
+
 def lastest_news(browser):
     '''This function will scrape the web for featured titles and blurbs.'''
     browser.visit('https://static.bc-edx.com/data/web/mars_news/index.html')
@@ -50,35 +51,56 @@ def lastest_news(browser):
     return web_texts, titles, descriptions
 
 
-def featured_mars():
-    return url
+def featured_mars(browser):
+    '''This function will scrape the featured image and 
+    pull the link to that image.'''
+
+    # assign URL
+    url_image = "https://spaceimages-mars.com/"
+    browser.visit(url_image)
+    my_service = Service()
+    search_button = browser.find_by_xpath('//div[1]/div/a/button')
+    search_button.click()
+    time.sleep(2)
+    image_tag = browser.find_by_xpath('/html/body/div[8]/div/div/div/div/img')
+    featured_image_url = image_tag['src']
+    return featured_image_url
 
 
 def mars_table():
     url = 'https://galaxyfacts-mars.com/'
     all_tables = pd.read_html(url)
-    tb = mars_table.to_html(classes = 'table')
-    return tb
+    mars_table = all_tables[0]
+    scraped_table = mars_table.to_html(classes = 'table')
+    return scraped_table
+
 
 def hemispheres():
-    list_hemis = []
-    list_hemis.append({title: #text,
-     img_url: #url
-     })
+    url_hemis = 'https://marshemispheres.com/'
+    html_content = requests.get(url_hemis).text
+    soup = bs4(html_content, "html.parser")
+    mars_image = soup.find().text
+    # list_hemis = []
+    # list_hemis.append({title: #text,
+    #  img_url: #url
+    #  })
 
-    return [#list of dictionaries]
-        pass
+    #return [#list of dictionaries]
+    
 
 def scrape():
     ''' This scrapes the page. main function'''
     browser = open_browser()
     web_texts, titles, descriptions = lastest_news(browser)
-    image_url = featured_mars()
+    image_url = featured_mars(browser)
+    mars_tbl = mars_table()
 
     
-    mars_dictionary = {'news_title': title,
-                       'news_paragraph': paragraph,
+    mars_dictionary = {'news_title': titles[0],
+                       'news_paragraph': descriptions[0],
                        'featured_image': image_url,
-                        'facts': mars_table(),
+                        'facts': mars_tbl,
                         'hemispheres': []
                        }
+
+scrape()
