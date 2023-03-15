@@ -20,9 +20,34 @@ def open_browser():
     browser = Browser('chrome')
     return browser
 
-def lastest_news():
+def lastest_news(browser):
+    '''This function will scrape the web for featured titles and blurbs.'''
+    browser.visit('https://static.bc-edx.com/data/web/mars_news/index.html')
+    # assign URL
+    url = "https://static.bc-edx.com/data/web/mars_news/index.html"
+    browser.visit(url)
+    #beautiful soup
+    html_content = requests.get(url).text
+    soup = bs4(html_content, "html.parser")
+    mars_text = soup.find().text
+    title_results = soup.find_all('div', class_ = 'content_title')
+    description_results = soup.find_all('div', class_ = 'article_teaser_body')
     
-    return title, paragraph
+    web_texts =[]
+    titles = []
+    descriptions = []
+
+    for title in title_results:
+        titles.append(title.text)
+        for description in description_results:
+            descriptions.append(description.text)
+            web_text_dict = {
+                "article_title":title.text,
+                "article_teaser": description.text
+            }
+            web_texts.append(web_text_dict)
+    
+    return web_texts, titles, descriptions
 
 
 def featured_mars():
@@ -42,11 +67,12 @@ def hemispheres():
      })
 
     return [#list of dictionaries]
+        pass
 
 def scrape():
     ''' This scrapes the page. main function'''
     browser = open_browser()
-    title, paragraph = lastest_news()
+    web_texts, titles, descriptions = lastest_news(browser)
     image_url = featured_mars()
 
     
